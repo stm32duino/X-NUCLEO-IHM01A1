@@ -58,7 +58,7 @@ class Component {
 
     /**
      * @brief     Initializing the component.
-     * @param[in] init pointer to device specific initalization structure.
+     * @param[in] init pointer to device specific initialization structure.
      * @retval    "0" in case of success, an error code otherwise.
      */
     virtual int init(void *init) = 0;

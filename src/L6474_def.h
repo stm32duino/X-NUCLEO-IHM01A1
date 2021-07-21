@@ -491,7 +491,7 @@ typedef struct {
   /* Minimum OFF time in us (TOFF_MIN register). Range: 0.5us to 64us. */
   float minimum_OFF_time_us;
 
-  /* Target Swicthing Period (field TOFF of CONFIG register). */
+  /* Target Switching Period (field TOFF of CONFIG register). */
   L6474_CONFIG_TOFF_t target_swicthing_period;
 
   /* Slew rate (POW_SR field of CONFIG register). */
@@ -527,7 +527,7 @@ typedef struct {
   void (*errorHandlerCallback)(uint16_t error);
   bool spiPreemtionByIsr; // = FALSE;
   bool isrFlag; // = FALSE;
-  /// L6474 Device Paramaters structure
+  /// L6474 Device Parameters structure
   deviceParams_t devicePrm; //[MAX_NUMBER_OF_DEVICES];
   uint8_t number_of_devices;
   uint8_t device_instance;

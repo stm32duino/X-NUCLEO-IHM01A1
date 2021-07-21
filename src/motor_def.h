@@ -167,7 +167,7 @@ typedef struct {
   volatile int32_t currentPosition;
   /// position in step at the end of the accelerating phase
   volatile uint32_t endAccPos;
-  /// nb steps performed from the beggining of the goto or the move command
+  /// nb steps performed from the beginning of the goto or the move command
   volatile uint32_t relativePos;
   /// position in step at the start of the decelerating phase
   volatile uint32_t startDecPos;

@@ -185,11 +185,11 @@ extern "C" {
 /// Synch. selection settings for device 2 (SYNC_SEL field of STEP_MODE register)
 #define L6474_CONF_PARAM_SYNC_SEL_DEVICE_2  (L6474_SYNC_SEL_1_2)
 
-/// Target Swicthing Period for device 0 (field TOFF of CONFIG register)
+/// Target Switching Period for device 0 (field TOFF of CONFIG register)
 #define L6474_CONF_PARAM_TOFF_DEVICE_0  (L6474_CONFIG_TOFF_044us)
-/// Target Swicthing Period for device 1 (field TOFF of CONFIG register)
+/// Target Switching Period for device 1 (field TOFF of CONFIG register)
 #define L6474_CONF_PARAM_TOFF_DEVICE_1  (L6474_CONFIG_TOFF_044us)
-/// Target Swicthing Period for device 2 (field TOFF of CONFIG register)
+/// Target Switching Period for device 2 (field TOFF of CONFIG register)
 #define L6474_CONF_PARAM_TOFF_DEVICE_2  (L6474_CONFIG_TOFF_044us)
 
 /// Slew rate for device 0 (POW_SR field of CONFIG register)

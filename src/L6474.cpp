@@ -93,7 +93,7 @@ uint8_t L6474::spi_rx_bursts[L6474_CMD_ARG_MAX_NB_BYTES][MAX_NUMBER_OF_DEVICES];
  * The call back will be then called each time the library
  * detects an error
  * @param[in] callback Name of the callback to attach
- * to the error Hanlder
+ * to the error Handler
  * @retval None
  **********************************************************/
 void L6474::L6474_AttachErrorHandler(void (*callback)(uint16_t error))
@@ -299,7 +299,7 @@ void L6474::L6474_GoTo(int32_t targetPosition)
 }
 
 /**********************************************************
- * @brief  Immediatly stops the motor and disable the power bridge
+ * @brief  Immediately stops the motor and disable the power bridge
  * @retval None
  **********************************************************/
 void L6474::L6474_HardStop(void)
@@ -509,7 +509,7 @@ void L6474::L6474_CmdEnable(void)
 
 /**********************************************************
  * @brief  Issues the GetParam command to the L6474 of the specified device
- * @param[in] parameter Register adress (L6474_ABS_POS, L6474_MARK,...)
+ * @param[in] parameter Register address (L6474_ABS_POS, L6474_MARK,...)
  * @retval Register value
  **********************************************************/
 uint32_t L6474::L6474_CmdGetParam(L6474_Registers_t parameter)
@@ -636,7 +636,7 @@ void L6474::L6474_CmdNop(void)
 
 /**********************************************************
  * @brief  Issues the SetParam command to the L6474 of the specified device
- * @param[in] parameter Register adress (L6474_ABS_POS, L6474_MARK,...)
+ * @param[in] parameter Register address (L6474_ABS_POS, L6474_MARK,...)
  * @param[in] value Value to set in the register
  * @retval None
  **********************************************************/

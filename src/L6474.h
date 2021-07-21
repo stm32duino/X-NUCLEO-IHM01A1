@@ -185,7 +185,7 @@ class L6474 : public StepperMotor {
      *------------------------------------------------------------------------*/
     /**
      * @brief  Initializing the component in 1/16 Microstepping mode.
-     * @param  init Pointer to device specific initalization structure.
+     * @param  init Pointer to device specific initialization structure.
      * @retval "0" in case of success, an error code otherwise.
      */
     virtual int init(void *init = NULL)

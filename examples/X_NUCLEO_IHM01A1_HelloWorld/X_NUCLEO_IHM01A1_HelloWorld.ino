@@ -76,7 +76,7 @@ L6474_init_t init_s = {
   L6474_TOFF_FAST_8us,              /* Maximum fast decay time (T_OFF field of T_FAST register). Range: 2us to 32us. */
   3,                                /* Minimum ON time in us (TON_MIN register). Range: 0.5us to 64us. */
   21,                               /* Minimum OFF time in us (TOFF_MIN register). Range: 0.5us to 64us. */
-  L6474_CONFIG_TOFF_044us,          /* Target Swicthing Period (field TOFF of CONFIG register). */
+  L6474_CONFIG_TOFF_044us,          /* Target Switching Period (field TOFF of CONFIG register). */
   L6474_CONFIG_SR_320V_us,          /* Slew rate (POW_SR field of CONFIG register). */
   L6474_CONFIG_INT_16MHZ,           /* Clock setting (OSC_CLK_SEL field of CONFIG register). */
   L6474_ALARM_EN_OVERCURRENT |
@@ -115,7 +115,7 @@ void flag_irq_handler(void)
   unsigned int status = motor->get_status();
 
   /* Check NOTPERF_CMD flag: if set, the command received by SPI can't be performed. */
-  /* This often occures when a command is sent to the L6474 while it is not in HiZ state. */
+  /* This often occurs when a command is sent to the L6474 while it is not in HiZ state. */
   if ((status & L6474_STATUS_NOTPERF_CMD) == L6474_STATUS_NOTPERF_CMD) {
     Serial.println("    WARNING: FLAG interrupt triggered. Non-performable command detected when updating L6474's registers while not in HiZ state.");
   }
@@ -348,7 +348,7 @@ void setup()
   /* Printing to the console. */
   Serial.println("--> Hard Stop.");
 
-  /* Requesting to immediatly stop. */
+  /* Requesting to immediately stop. */
   motor->hard_stop();
 
   /* Waiting while the motor is active. */
