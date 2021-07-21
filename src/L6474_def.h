@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file    L6474_def.h 
+ * @file    L6474_def.h
  * @author  IPC Rennes
  * @version V1.5.0
  * @date    November 12, 2014
@@ -43,8 +43,8 @@
 #define __L6474_H
 
 #ifdef __cplusplus
- extern "C" {
-#endif 
+extern "C" {
+#endif
 
 
 /* Includes ------------------------------------------------------------------*/
@@ -61,15 +61,15 @@
 
 /** @addtogroup Components
  * @{
- */  
-  
+ */
+
 /** @addtogroup L6474
  * @{
  */
-  
+
 /** @defgroup L6474_Exported_Defines L6474_Exported_Defines
  * @{
- */  
+ */
 
 /// Current FW version
 #define L6474_FW_VERSION                        (5)
@@ -85,18 +85,18 @@
 
 /// L6474 value mask for ABS_POS register
 #define L6474_ABS_POS_VALUE_MASK    ((uint32_t) 0x003FFFFF)
-   
+
 /// L6474 sign bit mask for ABS_POS register
 #define L6474_ABS_POS_SIGN_BIT_MASK ((uint32_t) 0x00200000)
 
-     
+
 /* Types ---------------------------------------------------------------------*/
 
 /** @defgroup L6474_Exported_Types
   * @{
-  */   
+  */
 
-/** @defgroup L6474_Fast_Decay_Time_Options  
+/** @defgroup L6474_Fast_Decay_Time_Options
   * @{
   */
 ///TOFF_FAST values for T_FAST register
@@ -122,7 +122,7 @@ typedef enum {
   * @}
   */
 
-/** @defgroup L6474_Fall_Step_Time_Options 
+/** @defgroup L6474_Fall_Step_Time_Options
   * @{
   */
 ///FAST_STEP values for T_FAST register
@@ -174,9 +174,9 @@ typedef enum {
   * @}
   */
 
-/** @defgroup L6474_STEP_MODE_Register_Masks 
+/** @defgroup L6474_STEP_MODE_Register_Masks
   * @{
-  */  
+  */
 ///STEP_MODE register
 typedef enum {
   L6474_STEP_MODE_STEP_SEL = ((uint8_t) 0x07),
@@ -201,7 +201,7 @@ typedef enum {
   * @}
   */
 
-/** @defgroup L6474_SYNC_SEL_Options_For_STEP_MODE_Register 
+/** @defgroup L6474_SYNC_SEL_Options_For_STEP_MODE_Register
   * @{
   */
 ///SYNC_SEL field of STEP_MODE register
@@ -301,10 +301,10 @@ typedef enum {
   */
 /// POW_SR values for CONFIG register
 typedef enum {
-  L6474_CONFIG_SR_320V_us    =((uint16_t)0x0000),
-  L6474_CONFIG_SR_075V_us    =((uint16_t)0x0100),
-  L6474_CONFIG_SR_110V_us    =((uint16_t)0x0200),
-  L6474_CONFIG_SR_260V_us    =((uint16_t)0x0300)
+  L6474_CONFIG_SR_320V_us    = ((uint16_t)0x0000),
+  L6474_CONFIG_SR_075V_us    = ((uint16_t)0x0100),
+  L6474_CONFIG_SR_110V_us    = ((uint16_t)0x0200),
+  L6474_CONFIG_SR_260V_us    = ((uint16_t)0x0300)
 } L6474_CONFIG_POW_SR_t;
 /**
   * @}
@@ -371,7 +371,7 @@ typedef enum {
 
 /** @defgroup L6474_Direction_Field_Of_STATUS_Register
   * @{
-  */  
+  */
 ///Diretion field of STATUS register
 typedef enum {
   L6474_STATUS_DIR_FORWARD = (((uint16_t) 0x0001) << 4),
@@ -434,7 +434,7 @@ typedef enum {
   L6474_RESERVED_CMD2 = ((uint8_t) 0xF8)
 } L6474_Commands_t;
 
-/** 
+/**
  * @brief  L6474 driver initialization structure definition.
  */
 /* ACTION --------------------------------------------------------------------*
@@ -448,8 +448,7 @@ typedef enum {
  *     int update_mode;                                                       *
  *   } COMPONENT_Init_t;                                                      *
  *----------------------------------------------------------------------------*/
-typedef struct
-{
+typedef struct {
   /* Acceleration rate in pps^2. Range: (0..+inf). */
   int acceleration_pps_2;
 
@@ -473,7 +472,7 @@ typedef struct
 
   /* Torque regulation method (EN_TQREG field of CONFIG register). */
   L6474_CONFIG_EN_TQREG_t torque_regulation_method;
-  
+
   /* Step selection (STEP_SEL field of STEP_MODE register). */
   L6474_STEP_SEL_t step_selection;
 
@@ -505,9 +504,9 @@ typedef struct
   int alarm;
 } L6474_init_t;
 
-/** 
+/**
  * @brief  L6474 driver data structure definition.
- */ 
+ */
 /* ACTION --------------------------------------------------------------------*
  * Declare here the structure of component's data, if any, one variable per   *
  * line without initialization.                                               *
@@ -521,8 +520,7 @@ typedef struct
  *       float T1_degC;                                                       *
  *   } COMPONENT_Data_t;                                                      *
  *----------------------------------------------------------------------------*/
-typedef struct
-{
+typedef struct {
   /// Function pointer to flag interrupt call back
   void (*flagInterruptCallback)(void);
   /// Function pointer to error handler call back
@@ -567,32 +565,32 @@ typedef struct
  *   extern void     COMPONENT_IO_ITConfig(void);                             *
  *----------------------------------------------------------------------------*/
 ///Delay of the requested number of milliseconds
-extern void L6474_Delay(void *handle, uint32_t delay);     
+extern void L6474_Delay(void *handle, uint32_t delay);
 ///Enable Irq
-extern void L6474_EnableIrq(void *handle);               
+extern void L6474_EnableIrq(void *handle);
 ///Disable Irq
-extern void L6474_DisableIrq(void *handle);              
+extern void L6474_DisableIrq(void *handle);
 ///Set PWM1 frequency and start it
-extern void L6474_Pwm1SetFreq(void *handle, uint16_t newFreq); 
-///Set PWM2 frequency and start it  
-extern void L6474_Pwm2SetFreq(void *handle, uint16_t newFreq); 
+extern void L6474_Pwm1SetFreq(void *handle, uint16_t newFreq);
+///Set PWM2 frequency and start it
+extern void L6474_Pwm2SetFreq(void *handle, uint16_t newFreq);
 ///Set PWM3 frequency and start it
-extern void L6474_Pwm3SetFreq(void *handle, uint16_t newFreq); 
+extern void L6474_Pwm3SetFreq(void *handle, uint16_t newFreq);
 ///Init the PWM
 extern void L6474_PwmInit(void *handle);
 ///Stop the PWM
-extern void L6474_PwmStop(void *handle);    
-///Reset the L6474 reset pin 
-extern void L6474_ReleaseReset(void *handle);           
-///Set the L6474 reset pin 
-extern void L6474_Reset(void *handle);                  
+extern void L6474_PwmStop(void *handle);
+///Reset the L6474 reset pin
+extern void L6474_ReleaseReset(void *handle);
+///Set the L6474 reset pin
+extern void L6474_Reset(void *handle);
 ///Set direction GPIO
-extern void L6474_SetDirectionGpio(void *handle, uint8_t gpioState); 
+extern void L6474_SetDirectionGpio(void *handle, uint8_t gpioState);
 ///Write bytes to the L6474s via SPI
 extern uint8_t L6474_SpiWriteBytes(void *handle, uint8_t *pByteToTransmit, uint8_t *pReceivedByte);
 
 #ifdef __cplusplus
-  }
+}
 #endif
 
 #endif /* #ifndef __L6474_H */

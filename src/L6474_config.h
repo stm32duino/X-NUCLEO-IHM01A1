@@ -44,28 +44,28 @@
 #define __L6474_TARGET_CONFIG_H
 
 #ifdef __cplusplus
- extern "C" {
-#endif 
+extern "C" {
+#endif
 
 
 /* Definitions ---------------------------------------------------------------*/
 
 /** @addtogroup BSP
   * @{
-  */   
+  */
 
 /** @addtogroup L6474
   * @{
-  */   
+  */
 
 /** @addtogroup L6474_Exported_Constants
   * @{
-  */   
+  */
 
 /** @defgroup Predefined_L6474_Registers_Values
   * @{
-  */   
-   
+  */
+
 /// The maximum number of devices in the daisy chain
 #define MAX_NUMBER_OF_DEVICES                 (3)
 
@@ -221,7 +221,7 @@
 #define L6474_CONF_PARAM_CLOCK_SETTING_DEVICE_2  (L6474_CONFIG_INT_16MHZ)
 
 #ifdef __cplusplus
-  }
+}
 #endif
 
 #endif /* __L6474_TARGET_CONFIG_H */

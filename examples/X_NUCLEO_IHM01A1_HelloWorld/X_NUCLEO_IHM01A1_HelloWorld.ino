@@ -62,29 +62,29 @@
 
 /* Initialization parameters. */
 L6474_init_t init_s = {
-    160,                              /* Acceleration rate in pps^2. Range: (0..+inf). */
-    160,                              /* Deceleration rate in pps^2. Range: (0..+inf). */
-    1600,                             /* Maximum speed in pps. Range: (30..10000]. */
-    800,                              /* Minimum speed in pps. Range: [30..10000). */
-    250,                              /* Torque regulation current in mA. Range: 31.25mA to 4000mA. */
-    L6474_OCD_TH_750mA,               /* Overcurrent threshold (OCD_TH register). */
-    L6474_CONFIG_OC_SD_ENABLE,        /* Overcurrent shutwdown (OC_SD field of CONFIG register). */
-    L6474_CONFIG_EN_TQREG_TVAL_USED,  /* Torque regulation method (EN_TQREG field of CONFIG register). */
-    L6474_STEP_SEL_1_8,               /* Step selection (STEP_SEL field of STEP_MODE register). */
-    L6474_SYNC_SEL_1_2,               /* Sync selection (SYNC_SEL field of STEP_MODE register). */
-    L6474_FAST_STEP_12us,             /* Fall time value (T_FAST field of T_FAST register). Range: 2us to 32us. */
-    L6474_TOFF_FAST_8us,              /* Maximum fast decay time (T_OFF field of T_FAST register). Range: 2us to 32us. */
-    3,                                /* Minimum ON time in us (TON_MIN register). Range: 0.5us to 64us. */
-    21,                               /* Minimum OFF time in us (TOFF_MIN register). Range: 0.5us to 64us. */
-    L6474_CONFIG_TOFF_044us,          /* Target Swicthing Period (field TOFF of CONFIG register). */
-    L6474_CONFIG_SR_320V_us,          /* Slew rate (POW_SR field of CONFIG register). */
-    L6474_CONFIG_INT_16MHZ,           /* Clock setting (OSC_CLK_SEL field of CONFIG register). */
-    L6474_ALARM_EN_OVERCURRENT |
-    L6474_ALARM_EN_THERMAL_SHUTDOWN |
-    L6474_ALARM_EN_THERMAL_WARNING |
-    L6474_ALARM_EN_UNDERVOLTAGE |
-    L6474_ALARM_EN_SW_TURN_ON |
-    L6474_ALARM_EN_WRONG_NPERF_CMD    /* Alarm (ALARM_EN register). */
+  160,                              /* Acceleration rate in pps^2. Range: (0..+inf). */
+  160,                              /* Deceleration rate in pps^2. Range: (0..+inf). */
+  1600,                             /* Maximum speed in pps. Range: (30..10000]. */
+  800,                              /* Minimum speed in pps. Range: [30..10000). */
+  250,                              /* Torque regulation current in mA. Range: 31.25mA to 4000mA. */
+  L6474_OCD_TH_750mA,               /* Overcurrent threshold (OCD_TH register). */
+  L6474_CONFIG_OC_SD_ENABLE,        /* Overcurrent shutwdown (OC_SD field of CONFIG register). */
+  L6474_CONFIG_EN_TQREG_TVAL_USED,  /* Torque regulation method (EN_TQREG field of CONFIG register). */
+  L6474_STEP_SEL_1_8,               /* Step selection (STEP_SEL field of STEP_MODE register). */
+  L6474_SYNC_SEL_1_2,               /* Sync selection (SYNC_SEL field of STEP_MODE register). */
+  L6474_FAST_STEP_12us,             /* Fall time value (T_FAST field of T_FAST register). Range: 2us to 32us. */
+  L6474_TOFF_FAST_8us,              /* Maximum fast decay time (T_OFF field of T_FAST register). Range: 2us to 32us. */
+  3,                                /* Minimum ON time in us (TON_MIN register). Range: 0.5us to 64us. */
+  21,                               /* Minimum OFF time in us (TOFF_MIN register). Range: 0.5us to 64us. */
+  L6474_CONFIG_TOFF_044us,          /* Target Swicthing Period (field TOFF of CONFIG register). */
+  L6474_CONFIG_SR_320V_us,          /* Slew rate (POW_SR field of CONFIG register). */
+  L6474_CONFIG_INT_16MHZ,           /* Clock setting (OSC_CLK_SEL field of CONFIG register). */
+  L6474_ALARM_EN_OVERCURRENT |
+  L6474_ALARM_EN_THERMAL_SHUTDOWN |
+  L6474_ALARM_EN_THERMAL_WARNING |
+  L6474_ALARM_EN_UNDERVOLTAGE |
+  L6474_ALARM_EN_SW_TURN_ON |
+  L6474_ALARM_EN_WRONG_NPERF_CMD    /* Alarm (ALARM_EN register). */
 };
 
 /* SPI instance */
@@ -108,274 +108,275 @@ L6474 *motor;
  */
 void flag_irq_handler(void)
 {
-    /* Set ISR flag. */
-    motor->isr_flag = TRUE;
+  /* Set ISR flag. */
+  motor->isr_flag = TRUE;
 
-    /* Get the value of the status register. */
-    unsigned int status = motor->get_status();
+  /* Get the value of the status register. */
+  unsigned int status = motor->get_status();
 
-    /* Check NOTPERF_CMD flag: if set, the command received by SPI can't be performed. */
-    /* This often occures when a command is sent to the L6474 while it is not in HiZ state. */
-    if ((status & L6474_STATUS_NOTPERF_CMD) == L6474_STATUS_NOTPERF_CMD) {
-        Serial.println("    WARNING: FLAG interrupt triggered. Non-performable command detected when updating L6474's registers while not in HiZ state.");
-    }
-    
-    /* Reset ISR flag. */
-    motor->isr_flag = FALSE;
+  /* Check NOTPERF_CMD flag: if set, the command received by SPI can't be performed. */
+  /* This often occures when a command is sent to the L6474 while it is not in HiZ state. */
+  if ((status & L6474_STATUS_NOTPERF_CMD) == L6474_STATUS_NOTPERF_CMD) {
+    Serial.println("    WARNING: FLAG interrupt triggered. Non-performable command detected when updating L6474's registers while not in HiZ state.");
+  }
+
+  /* Reset ISR flag. */
+  motor->isr_flag = FALSE;
 }
 
-void setup() {
-    /*----- Initialization. -----*/
-    Serial.begin(115200);
+void setup()
+{
+  /*----- Initialization. -----*/
+  Serial.begin(115200);
 
-    /* Initializing Motor Control Component. */
-    motor = new L6474(D2, D8, D7, D9, D10, &dev_spi);
-    if (motor->init(&init_s) != COMPONENT_OK) {
-        exit(EXIT_FAILURE);
-    }
+  /* Initializing Motor Control Component. */
+  motor = new L6474(D2, D8, D7, D9, D10, &dev_spi);
+  if (motor->init(&init_s) != COMPONENT_OK) {
+    exit(EXIT_FAILURE);
+  }
 
-    /* Attaching and enabling interrupt handlers. */
-    motor->attach_flag_irq(&flag_irq_handler);
-    motor->enable_flag_irq();
+  /* Attaching and enabling interrupt handlers. */
+  motor->attach_flag_irq(&flag_irq_handler);
+  motor->enable_flag_irq();
 
-    /* Printing to the console. */
-    Serial.println("Motor Control Application Example for 1 Motor");
-    Serial.println("");
-
-
-    /*----- Moving. -----*/
-
-    /* Printing to the console. */
-    Serial.print("--> Moving forward ");
-    Serial.print(STEPS_1);
-    Serial.println(" steps.");
-
-    /* Moving N steps in the forward direction. */
-    motor->move(StepperMotor::FWD, STEPS_1);
-
-    /* Waiting while the motor is active. */
-    motor->wait_while_active();
-
-    /* Getting current position. */
-    int position = motor->get_position();
-    
-    /* Printing to the console. */
-    Serial.print("    Position: ");
-    Serial.print(position);
-    Serial.println(".");
-
-    /* Waiting. */
-    delay(DELAY_1);
+  /* Printing to the console. */
+  Serial.println("Motor Control Application Example for 1 Motor");
+  Serial.println("");
 
 
-    /*----- Changing the motor setting. -----*/
+  /*----- Moving. -----*/
 
-    /* Printing to the console. */
-    Serial.println("--> Setting Torque Regulation Current to 500[mA].");
+  /* Printing to the console. */
+  Serial.print("--> Moving forward ");
+  Serial.print(STEPS_1);
+  Serial.println(" steps.");
 
-    /* Increasing the torque regulation current to 500[mA]. */
-    motor->set_parameter(L6474_TVAL, 500);
+  /* Moving N steps in the forward direction. */
+  motor->move(StepperMotor::FWD, STEPS_1);
 
-    /* Printing to the console. */
-    Serial.println("--> Doubling the microsteps.");
+  /* Waiting while the motor is active. */
+  motor->wait_while_active();
 
-    /* Doubling the microsteps. */
-    if (!motor->set_step_mode((StepperMotor::step_mode_t) STEP_MODE_1_16)) {
-        Serial.println("    Step Mode not allowed.");
-    }
+  /* Getting current position. */
+  int position = motor->get_position();
 
-    /* Waiting. */
-    delay(DELAY_1);
+  /* Printing to the console. */
+  Serial.print("    Position: ");
+  Serial.print(position);
+  Serial.println(".");
 
-    /* Printing to the console. */
-    Serial.println("--> Setting Home.");
-
-    /* Setting the current position to be the home position. */
-    motor->set_home();
-
-    /* Getting current position. */
-    position = motor->get_position();
-    
-    /* Printing to the console. */
-    Serial.print("    Position: ");
-    Serial.print(position);
-    Serial.println(".");
-    
-    /* Waiting. */
-    delay(DELAY_2);
+  /* Waiting. */
+  delay(DELAY_1);
 
 
-    /*----- Moving. -----*/
-    
-    /* Printing to the console. */
-    Serial.print("--> Moving backward ");
-    Serial.print(STEPS_1);
-    Serial.println(" steps.");
+  /*----- Changing the motor setting. -----*/
 
-    /* Moving N steps in the backward direction. */
-    motor->move(StepperMotor::BWD, STEPS_1);
-    
-    /* Waiting while the motor is active. */
-    motor->wait_while_active();
+  /* Printing to the console. */
+  Serial.println("--> Setting Torque Regulation Current to 500[mA].");
 
-    /* Getting current position. */
-    position = motor->get_position();
-    
-    /* Printing to the console. */
-    Serial.print("    Position: ");
-    Serial.print(position);
-    Serial.println(".");
+  /* Increasing the torque regulation current to 500[mA]. */
+  motor->set_parameter(L6474_TVAL, 500);
 
-    /* Waiting. */
-    delay(DELAY_1);
+  /* Printing to the console. */
+  Serial.println("--> Doubling the microsteps.");
 
+  /* Doubling the microsteps. */
+  if (!motor->set_step_mode((StepperMotor::step_mode_t) STEP_MODE_1_16)) {
+    Serial.println("    Step Mode not allowed.");
+  }
 
-    /*----- Going to a specified position. -----*/
+  /* Waiting. */
+  delay(DELAY_1);
 
-    /* Printing to the console. */
-    Serial.print("--> Going to position ");
-    Serial.print(STEPS_1);
-    Serial.println(".");
-    
-    /* Requesting to go to a specified position. */
-    motor->go_to(STEPS_1);
-    
-    /* Waiting while the motor is active. */
-    motor->wait_while_active();
+  /* Printing to the console. */
+  Serial.println("--> Setting Home.");
 
-    /* Getting current position. */
-    position = motor->get_position();
-    
-    /* Printing to the console. */
-    Serial.print("    Position: ");
-    Serial.print(position);
-    Serial.println(".");
-    
-    /* Waiting. */
-    delay(DELAY_2);
+  /* Setting the current position to be the home position. */
+  motor->set_home();
 
-    
-    /*----- Going Home. -----*/
+  /* Getting current position. */
+  position = motor->get_position();
 
-    /* Printing to the console. */
-    Serial.println("--> Going Home.");
-    
-    /* Requesting to go to home. */
-    motor->go_home();
-    
-    /* Waiting while the motor is active. */
-    motor->wait_while_active();
+  /* Printing to the console. */
+  Serial.print("    Position: ");
+  Serial.print(position);
+  Serial.println(".");
 
-    /* Getting current position. */
-    position = motor->get_position();
-
-    /* Printing to the console. */
-    Serial.print("    Position: ");
-    Serial.print(position);
-    Serial.println(".");
-
-    /* Waiting. */
-    delay(DELAY_2);
+  /* Waiting. */
+  delay(DELAY_2);
 
 
-    /*----- Running. -----*/
+  /*----- Moving. -----*/
 
-    /* Printing to the console. */
-    Serial.print("--> Running backward for ");
-    Serial.print((DELAY_3 / 1000));
-    Serial.println(" seconds.");
+  /* Printing to the console. */
+  Serial.print("--> Moving backward ");
+  Serial.print(STEPS_1);
+  Serial.println(" steps.");
 
-    /* Requesting to run backward. */
-    motor->run(StepperMotor::BWD);
+  /* Moving N steps in the backward direction. */
+  motor->move(StepperMotor::BWD, STEPS_1);
 
-    /* Waiting. */
-    delay(DELAY_3);
+  /* Waiting while the motor is active. */
+  motor->wait_while_active();
 
-    /* Getting current speed. */
-    int speed = motor->get_speed();
+  /* Getting current position. */
+  position = motor->get_position();
 
-    /* Printing to the console. */
-    Serial.print("    Speed: ");
-    Serial.print(speed);
-    Serial.println(".");
+  /* Printing to the console. */
+  Serial.print("    Position: ");
+  Serial.print(position);
+  Serial.println(".");
 
-    /*----- Increasing the speed while running. -----*/
-
-    /* Printing to the console. */
-    Serial.print("--> Increasing the speed while running again for ");
-    Serial.print((DELAY_3 / 1000));
-    Serial.println(" seconds.");
-
-    /* Increasing the speed. */
-    motor->set_max_speed(SPEED_1);
-
-    /* Waiting. */
-    delay(DELAY_3);
-
-    /* Getting current speed. */
-    speed = motor->get_speed();
-
-    /* Printing to the console. */
-    Serial.print("    Speed: ");
-    Serial.print(speed);
-    Serial.println(".");
+  /* Waiting. */
+  delay(DELAY_1);
 
 
-    /*----- Decreasing the speed while running. -----*/
+  /*----- Going to a specified position. -----*/
 
-    /* Printing to the console. */
-    Serial.print("--> Decreasing the speed while running again for ");
-    Serial.print((DELAY_4 / 1000));
-    Serial.println(" seconds.");
+  /* Printing to the console. */
+  Serial.print("--> Going to position ");
+  Serial.print(STEPS_1);
+  Serial.println(".");
 
-    /* Decreasing the speed. */
-    motor->set_max_speed(SPEED_2);
+  /* Requesting to go to a specified position. */
+  motor->go_to(STEPS_1);
 
-    /* Waiting. */
-    delay(DELAY_4);
+  /* Waiting while the motor is active. */
+  motor->wait_while_active();
 
-    /* Getting current speed. */
-    speed = motor->get_speed();
+  /* Getting current position. */
+  position = motor->get_position();
 
-    /* Printing to the console. */
-    Serial.print("    Speed: ");
-    Serial.print(speed);
-    Serial.println(".");
+  /* Printing to the console. */
+  Serial.print("    Position: ");
+  Serial.print(position);
+  Serial.println(".");
+
+  /* Waiting. */
+  delay(DELAY_2);
 
 
-    /*----- Hard Stop. -----*/
+  /*----- Going Home. -----*/
 
-    /* Printing to the console. */
-    Serial.println("--> Hard Stop.");
+  /* Printing to the console. */
+  Serial.println("--> Going Home.");
 
-    /* Requesting to immediatly stop. */
-    motor->hard_stop();
+  /* Requesting to go to home. */
+  motor->go_home();
 
-    /* Waiting while the motor is active. */
-    motor->wait_while_active();
+  /* Waiting while the motor is active. */
+  motor->wait_while_active();
 
-    /* Waiting. */
-    delay(DELAY_2);
+  /* Getting current position. */
+  position = motor->get_position();
 
-    /*----- Infinite Loop. -----*/
+  /* Printing to the console. */
+  Serial.print("    Position: ");
+  Serial.print(position);
+  Serial.println(".");
 
-    /* Printing to the console. */
-    Serial.println("--> Infinite Loop...");
+  /* Waiting. */
+  delay(DELAY_2);
 
-    /* Setting the current position to be the home position. */
-    motor->set_home();
+
+  /*----- Running. -----*/
+
+  /* Printing to the console. */
+  Serial.print("--> Running backward for ");
+  Serial.print((DELAY_3 / 1000));
+  Serial.println(" seconds.");
+
+  /* Requesting to run backward. */
+  motor->run(StepperMotor::BWD);
+
+  /* Waiting. */
+  delay(DELAY_3);
+
+  /* Getting current speed. */
+  int speed = motor->get_speed();
+
+  /* Printing to the console. */
+  Serial.print("    Speed: ");
+  Serial.print(speed);
+  Serial.println(".");
+
+  /*----- Increasing the speed while running. -----*/
+
+  /* Printing to the console. */
+  Serial.print("--> Increasing the speed while running again for ");
+  Serial.print((DELAY_3 / 1000));
+  Serial.println(" seconds.");
+
+  /* Increasing the speed. */
+  motor->set_max_speed(SPEED_1);
+
+  /* Waiting. */
+  delay(DELAY_3);
+
+  /* Getting current speed. */
+  speed = motor->get_speed();
+
+  /* Printing to the console. */
+  Serial.print("    Speed: ");
+  Serial.print(speed);
+  Serial.println(".");
+
+  /*----- Decreasing the speed while running. -----*/
+
+  /* Printing to the console. */
+  Serial.print("--> Decreasing the speed while running again for ");
+  Serial.print((DELAY_4 / 1000));
+  Serial.println(" seconds.");
+
+  /* Decreasing the speed. */
+  motor->set_max_speed(SPEED_2);
+
+  /* Waiting. */
+  delay(DELAY_4);
+
+  /* Getting current speed. */
+  speed = motor->get_speed();
+
+  /* Printing to the console. */
+  Serial.print("    Speed: ");
+  Serial.print(speed);
+  Serial.println(".");
+
+
+  /*----- Hard Stop. -----*/
+
+  /* Printing to the console. */
+  Serial.println("--> Hard Stop.");
+
+  /* Requesting to immediatly stop. */
+  motor->hard_stop();
+
+  /* Waiting while the motor is active. */
+  motor->wait_while_active();
+
+  /* Waiting. */
+  delay(DELAY_2);
+
+  /*----- Infinite Loop. -----*/
+
+  /* Printing to the console. */
+  Serial.println("--> Infinite Loop...");
+
+  /* Setting the current position to be the home position. */
+  motor->set_home();
 }
 
-void loop() {
-    /* Requesting to go to a specified position. */
-    motor->go_to(STEPS_1 >> 1);
+void loop()
+{
+  /* Requesting to go to a specified position. */
+  motor->go_to(STEPS_1 >> 1);
 
-    /* Waiting while the motor is active. */
-    motor->wait_while_active();
+  /* Waiting while the motor is active. */
+  motor->wait_while_active();
 
-    /* Requesting to go to a specified position. */
-    motor->go_to(- (STEPS_1 >> 1));
+  /* Requesting to go to a specified position. */
+  motor->go_to(- (STEPS_1 >> 1));
 
-    /* Waiting while the motor is active. */
-    motor->wait_while_active();
+  /* Waiting while the motor is active. */
+  motor->wait_while_active();
 }

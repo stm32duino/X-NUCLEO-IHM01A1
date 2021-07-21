@@ -4,7 +4,7 @@
  * @author  IPC Rennes
  * @version V1.3.0
  * @date    November 12, 2014
- * @brief   This file contains all the functions prototypes for motor drivers.   
+ * @brief   This file contains all the functions prototypes for motor drivers.
  ******************************************************************************
  * @attention
  *
@@ -33,7 +33,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************
- */ 
+ */
 
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -42,23 +42,23 @@
 #define __MOTOR_H
 
 #ifdef __cplusplus
- extern "C" {
-#endif 
+extern "C" {
+#endif
 
 
 /* Includes ------------------------------------------------------------------*/
 
 #include <stdint.h>
 #include "component_def.h"
-   
+
 
 /* Definitions ---------------------------------------------------------------*/
 
-/// boolean for false condition 
+/// boolean for false condition
 #ifndef FALSE
 #define FALSE (0)
 #endif
-/// boolean for true condition 
+/// boolean for true condition
 #ifndef TRUE
 #define TRUE  (1)
 #endif
@@ -73,7 +73,7 @@
 /** @addtogroup Components
   * @{
   */
-    
+
 /** @addtogroup MOTOR
   * @{
   */
@@ -94,7 +94,7 @@ typedef enum {
 /**
   * @}
   */
-  
+
 /** @defgroup Device_Action_Options
   * @{
   */
@@ -105,28 +105,28 @@ typedef enum {
 } motorAction_t;
 /**
   * @}
-  */  
+  */
 
 /** @defgroup Device_States
   * @{
   */
 /// Device states
 typedef enum {
-  ACCELERATING = 0, 
-  DECELERATING = 1, 
+  ACCELERATING = 0,
+  DECELERATING = 1,
   STEADY = 2,
-  INACTIVE= 3
+  INACTIVE = 3
 } motorState_t;
 /**
   * @}
-  */   
+  */
 
 /** @defgroup Device_Step_mode
   * @{
   */
- /// Stepping options 
+/// Stepping options
 typedef enum {
-  STEP_MODE_FULL   = ((uint8_t)0x00), 
+  STEP_MODE_FULL   = ((uint8_t)0x00),
   STEP_MODE_HALF   = ((uint8_t)0x01),
   STEP_MODE_1_4    = ((uint8_t)0x02),
   STEP_MODE_1_8    = ((uint8_t)0x03),
@@ -140,16 +140,16 @@ typedef enum {
 } motorStepMode_t;
 /**
   * @}
-  */   
+  */
 
 /** @defgroup Device_Commands
   * @{
   */
-/// Device commands 
+/// Device commands
 typedef enum {
-  RUN_CMD, 
-  MOVE_CMD, 
-  SOFT_STOP_CMD, 
+  RUN_CMD,
+  MOVE_CMD,
+  SOFT_STOP_CMD,
   NO_CMD
 } deviceCommand_t;
 /**
@@ -162,33 +162,33 @@ typedef enum {
 /// Device Parameters Structure Type
 typedef struct {
   /// accumulator used to store speed increase smaller than 1 pps
-  volatile uint32_t accu;           
+  volatile uint32_t accu;
   /// Position in steps at the start of the goto or move commands
-  volatile int32_t currentPosition; 
+  volatile int32_t currentPosition;
   /// position in step at the end of the accelerating phase
-  volatile uint32_t endAccPos;      
+  volatile uint32_t endAccPos;
   /// nb steps performed from the beggining of the goto or the move command
-  volatile uint32_t relativePos;    
+  volatile uint32_t relativePos;
   /// position in step at the start of the decelerating phase
-  volatile uint32_t startDecPos;    
+  volatile uint32_t startDecPos;
   /// nb steps to perform for the goto or move commands
-  volatile uint32_t stepsToTake;   
-  /// acceleration in pps^2 
-  volatile uint16_t acceleration;  
+  volatile uint32_t stepsToTake;
+  /// acceleration in pps^2
+  volatile uint16_t acceleration;
   /// deceleration in pps^2
-  volatile uint16_t deceleration;  
+  volatile uint16_t deceleration;
   /// max speed in pps (speed use for goto or move command)
-  volatile uint16_t maxSpeed;      
+  volatile uint16_t maxSpeed;
   /// min speed in pps
-  volatile uint16_t minSpeed;      
-  /// current speed in pps    
-  volatile uint16_t speed;         
+  volatile uint16_t minSpeed;
+  /// current speed in pps
+  volatile uint16_t speed;
   /// command under execution
-  volatile deviceCommand_t commandExecuted; 
+  volatile deviceCommand_t commandExecuted;
   /// FORWARD or BACKWARD direction
-  volatile motorDir_t direction;                 
+  volatile motorDir_t direction;
   /// Current State of the device
-  volatile motorState_t motionState;       
+  volatile motorState_t motionState;
 } deviceParams_t;
 /**
   * @}
@@ -198,11 +198,10 @@ typedef struct {
   * @{
   */
 
-/** 
+/**
  * @brief  MOTOR driver virtual table structure definition.
  */
-typedef struct
-{
+typedef struct {
   /* ACTION ----------------------------------------------------------------*
    * Declare here the component's generic functions.                        *
    * Tag this group of functions with the " Generic " C-style comment.      *
@@ -247,35 +246,35 @@ typedef struct
    *------------------------------------------------------------------------*/
   /* Specific */
   /// Function pointer to GetAcceleration
-  uint16_t (*GetAcceleration)(void *handle); 
+  uint16_t (*GetAcceleration)(void *handle);
   /// Function pointer to GetCurrentSpeed
-  uint16_t (*GetCurrentSpeed)(void *handle); 
+  uint16_t (*GetCurrentSpeed)(void *handle);
   /// Function pointer to GetDeceleration
-  uint16_t (*GetDeceleration)(void *handle); 
+  uint16_t (*GetDeceleration)(void *handle);
   /// Function pointer to GetDeviceState
-  motorState_t(*GetDeviceState)(void *handle); 
+  motorState_t(*GetDeviceState)(void *handle);
   /// Function pointer to GetFwVersion
-  uint8_t (*GetFwVersion)(void *handle); 
+  uint8_t (*GetFwVersion)(void *handle);
   /// Function pointer to GetMark
-  int32_t (*GetMark)(void *handle); 
+  int32_t (*GetMark)(void *handle);
   /// Function pointer to GetMaxSpeed
-  uint16_t (*GetMaxSpeed)(void *handle); 
+  uint16_t (*GetMaxSpeed)(void *handle);
   /// Function pointer to GetMinSpeed
-  uint16_t (*GetMinSpeed)(void *handle); 
+  uint16_t (*GetMinSpeed)(void *handle);
   /// Function pointer to GetPosition
-  int32_t (*GetPosition)(void *handle); 
+  int32_t (*GetPosition)(void *handle);
   /// Function pointer to GoHome
-  void (*GoHome)(void *handle); 
+  void (*GoHome)(void *handle);
   /// Function pointer to GoMark
-  void (*GoMark)(void *handle); 
+  void (*GoMark)(void *handle);
   /// Function pointer to GoTo
-  void (*GoTo)(void *handle, int32_t targetPosition); 
+  void (*GoTo)(void *handle, int32_t targetPosition);
   /// Function pointer to HardStop
-  void (*HardStop)(void *handle); 
+  void (*HardStop)(void *handle);
   /// Function pointer to Move
-  void (*Move)(void *handle, motorDir_t direction, uint32_t stepCount); 
+  void (*Move)(void *handle, motorDir_t direction, uint32_t stepCount);
   /// Function pointer to ResetAllDevices
-  //void (*ResetAllDevices)(void *handle); 
+  //void (*ResetAllDevices)(void *handle);
   /// Function pointer to Run
   void (*Run)(void *handle, motorDir_t direction);
   /// Function pointer to SetAcceleration
@@ -283,41 +282,41 @@ typedef struct
   /// Function pointer to SetDeceleration
   bool (*SetDeceleration)(void *handle, uint16_t newDec);
   /// Function pointer to SetHome
-  void (*SetHome)(void *handle); 
+  void (*SetHome)(void *handle);
   /// Function pointer to SetMark
-  void (*SetMark)(void *handle); 
+  void (*SetMark)(void *handle);
   /// Function pointer to SetMaxSpeed
-  bool (*SetMaxSpeed)(void *handle, uint16_t newMaxSpeed); 
+  bool (*SetMaxSpeed)(void *handle, uint16_t newMaxSpeed);
   /// Function pointer to SetMinSpeed
-  bool (*SetMinSpeed)(void *handle, uint16_t newMinSpeed); 
+  bool (*SetMinSpeed)(void *handle, uint16_t newMinSpeed);
   /// Function pointer to SoftStop
-  bool (*SoftStop)(void *handle); 
+  bool (*SoftStop)(void *handle);
   /// Function pointer to StepClockHandler
-  void (*StepClockHandler)(void *handle);  
+  void (*StepClockHandler)(void *handle);
   /// Function pointer to WaitWhileActive
   void (*WaitWhileActive)(void *handle);
   /// Function pointer to CmdDisable
-  void (*CmdDisable)(void *handle); 
+  void (*CmdDisable)(void *handle);
   /// Function pointer to CmdEnable
   void (*CmdEnable)(void *handle);
   /// Function pointer to CmdGetParam
   uint32_t (*CmdGetParam)(void *handle, uint32_t param);
   /// Function pointer to CmdGetStatus
-  uint16_t (*CmdGetStatus)(void *handle); 
+  uint16_t (*CmdGetStatus)(void *handle);
   /// Function pointer to CmdNop
-  void (*CmdNop)(void *handle); 
-  /// Function pointer to CmdSetParam  
+  void (*CmdNop)(void *handle);
+  /// Function pointer to CmdSetParam
   void (*CmdSetParam)(void *handle, uint32_t param, uint32_t value);
   /// Function pointer to ReadStatusRegister
-  uint16_t (*ReadStatusRegister)(void *handle); 
+  uint16_t (*ReadStatusRegister)(void *handle);
   /// Function pointer to ReleaseReset
   void (*ReleaseReset)(void *handle);
   /// Function pointer to Reset
-  void (*Reset)(void *handle); 
+  void (*Reset)(void *handle);
   /// Function pointer to SelectStepMode
-  void (*SelectStepMode)(void *handle, motorStepMode_t stepMod); 
+  void (*SelectStepMode)(void *handle, motorStepMode_t stepMod);
   /// Function pointer to SetDirection
-  void (*SetDirection)(void *handle, motorDir_t direction);  
+  void (*SetDirection)(void *handle, motorDir_t direction);
   /// Function pointer to CmdGoToDir
   void (*CmdGoToDir)(void *handle, motorDir_t direction, int32_t targetPosition);
   /// Function pointer to CheckBusyHw
@@ -350,17 +349,17 @@ typedef struct
   bool (*IsDeviceBusy)(void *handle);
   /// Function pointer to SendQueuedCommands
   void (*SendQueuedCommands)(void *handle);
-  /// Function pointer to QueueCommands  
+  /// Function pointer to QueueCommands
   void (*QueueCommands)(void *handle, uint8_t temp, uint32_t command);
-  /// Function pointer to WaitForAllDevicesNotBusy  
-  void (*WaitForAllDevicesNotBusy)(void *handle);  
-  /// Function pointer to ErrorHandler  
+  /// Function pointer to WaitForAllDevicesNotBusy
+  void (*WaitForAllDevicesNotBusy)(void *handle);
+  /// Function pointer to ErrorHandler
   void (*ErrorHandler)(void *handle, uint16_t error);
   /// Function pointer to BusyInterruptHandler
   void (*BusyInterruptHandler)(void *handle);
   /// Function pointer to CmdSoftStop
-  void (*CmdSoftStop)(void *handle); 
-} MOTOR_VTable_t;    
+  void (*CmdSoftStop)(void *handle);
+} MOTOR_VTable_t;
 
 #ifdef __cplusplus
 }

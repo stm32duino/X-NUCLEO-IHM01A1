@@ -54,7 +54,7 @@
  * An abstract class for Generic components.
  */
 class Component {
-public:
+  public:
 
     /**
      * @brief     Initializing the component.

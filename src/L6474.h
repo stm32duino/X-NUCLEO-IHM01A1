@@ -58,12 +58,12 @@
 
 /* ACTION 1 ------------------------------------------------------------------*
  * Include here platform specific header files.                               *
- *----------------------------------------------------------------------------*/        
+ *----------------------------------------------------------------------------*/
 #include "Arduino.h"
 #include "SPI.h"
 /* ACTION 2 ------------------------------------------------------------------*
  * Include here component specific header files.                              *
- *----------------------------------------------------------------------------*/        
+ *----------------------------------------------------------------------------*/
 #include "L6474_def.h"
 /* ACTION 3 ------------------------------------------------------------------*
  * Include here interface specific header files.                              *
@@ -98,9 +98,8 @@ typedef void (*PwmHandler_Callback)(void);
 /**
  * @brief Class representing an L6474 component.
  */
-class L6474 : public StepperMotor 
-{
-public:
+class L6474 : public StepperMotor {
+  public:
 
     /*** Constructor and Destructor Methods ***/
 
@@ -113,49 +112,53 @@ public:
      * @param ssel          pin name of the SSEL pin of the SPI device to be used for communication.
      * @param spi           SPI device to be used for communication.
      */
-    L6474(uint8_t flag_irq, uint8_t standby_reset, uint8_t direction, uint8_t pwm_pin, uint8_t ssel, SPIClass *spi, uint32_t spi_speed=4000000) : StepperMotor(), flag_irq(flag_irq), standby_reset(standby_reset), direction(direction), pwm_pin(pwm_pin), ssel(ssel), dev_spi(spi), spi_speed(spi_speed)
+    L6474(uint8_t flag_irq, uint8_t standby_reset, uint8_t direction, uint8_t pwm_pin, uint8_t ssel, SPIClass *spi, uint32_t spi_speed = 4000000) : StepperMotor(), flag_irq(flag_irq), standby_reset(standby_reset), direction(direction), pwm_pin(pwm_pin), ssel(ssel), dev_spi(spi), spi_speed(spi_speed)
     {
-        /* Checking stackability. */
-        if (!(number_of_devices < MAX_NUMBER_OF_DEVICES)) {
-            Serial.print("Instantiation of the L6474 component failed: it can be stacked up to ");
-            Serial.print(MAX_NUMBER_OF_DEVICES);
-            Serial.println(" times.");
+      /* Checking stackability. */
+      if (!(number_of_devices < MAX_NUMBER_OF_DEVICES)) {
+        while (1) {
+          delay(1);
         }
+      }
 
-        pinMode(ssel, OUTPUT);
-        digitalWrite(ssel, HIGH);
-        pinMode(standby_reset, OUTPUT);
-        digitalWrite(standby_reset, LOW);
-        pinMode(direction, OUTPUT);
-        digitalWrite(direction, LOW);
-        pinMode(flag_irq, INPUT_PULLUP);
+      pinMode(ssel, OUTPUT);
+      digitalWrite(ssel, HIGH);
+      pinMode(standby_reset, OUTPUT);
+      digitalWrite(standby_reset, LOW);
+      pinMode(direction, OUTPUT);
+      digitalWrite(direction, LOW);
+      pinMode(flag_irq, INPUT_PULLUP);
 
-        Callback<void()>::func = std::bind(&L6474::L6474_StepClockHandler, this);
-        callback_handler = static_cast<PwmHandler_Callback>(Callback<void()>::callback);
+      Callback<void()>::func = std::bind(&L6474::L6474_StepClockHandler, this);
+      callback_handler = static_cast<PwmHandler_Callback>(Callback<void()>::callback);
 
-        pwm_instance = (TIM_TypeDef *)pinmap_peripheral(digitalPinToPinName(pwm_pin), PinMap_PWM);
-        pwm_channel = STM_PIN_CHANNEL(pinmap_function(digitalPinToPinName(pwm_pin), PinMap_PWM));
+      pwm_instance = (TIM_TypeDef *)pinmap_peripheral(digitalPinToPinName(pwm_pin), PinMap_PWM);
+      pwm_channel = STM_PIN_CHANNEL(pinmap_function(digitalPinToPinName(pwm_pin), PinMap_PWM));
 
-        pwm_timer = new HardwareTimer(pwm_instance);
+      pwm_timer = new HardwareTimer(pwm_instance);
 
-        /* ACTION 4 ----------------------------------------------------------*
-         * Initialize here the component's member variables, one variable per *
-         * line.                                                              *
-         *                                                                    *
-         * Example:                                                           *
-         *   measure = 0;                                                     *
-         *   instance_id = number_of_instances++;                             *
-         *--------------------------------------------------------------------*/
-        error_handler_callback = 0;
-        device_instance = number_of_devices++;
-        memset(spi_tx_bursts, 0, L6474_CMD_ARG_MAX_NB_BYTES * MAX_NUMBER_OF_DEVICES * sizeof(uint8_t));
-        memset(spi_rx_bursts, 0, L6474_CMD_ARG_MAX_NB_BYTES * MAX_NUMBER_OF_DEVICES * sizeof(uint8_t));
+      /* ACTION 4 ----------------------------------------------------------*
+       * Initialize here the component's member variables, one variable per *
+       * line.                                                              *
+       *                                                                    *
+       * Example:                                                           *
+       *   measure = 0;                                                     *
+       *   instance_id = number_of_instances++;                             *
+       *--------------------------------------------------------------------*/
+      error_handler_callback = 0;
+      device_instance = number_of_devices++;
+      memset(spi_tx_bursts, 0, L6474_CMD_ARG_MAX_NB_BYTES * MAX_NUMBER_OF_DEVICES * sizeof(uint8_t));
+      memset(spi_rx_bursts, 0, L6474_CMD_ARG_MAX_NB_BYTES * MAX_NUMBER_OF_DEVICES * sizeof(uint8_t));
     }
-    
+
     /**
      * @brief Destructor.
      */
-    virtual ~L6474(void) {}
+    virtual ~L6474(void)
+    {
+      free(pwm_timer);
+      number_of_devices--;
+    }
 
 
     /*** Public Component Related Methods ***/
@@ -187,7 +190,7 @@ public:
      */
     virtual int init(void *init = NULL)
     {
-        return (int) L6474_Init((void *) init);
+      return (int) L6474_Init((void *) init);
     }
 
     /**
@@ -197,7 +200,7 @@ public:
      */
     virtual int read_id(uint8_t *id = NULL)
     {
-        return (int) L6474_ReadID((uint8_t *) id);
+      return (int) L6474_ReadID((uint8_t *) id);
     }
 
     /**
@@ -209,7 +212,7 @@ public:
      */
     virtual unsigned int get_status(void)
     {
-        return (unsigned int) L6474_CmdGetStatus();
+      return (unsigned int) L6474_CmdGetStatus();
     }
 
     /**
@@ -250,23 +253,23 @@ public:
      */
     virtual float get_parameter(unsigned int parameter)
     {
-        unsigned int register_value = (unsigned int) L6474_CmdGetParam((L6474_Registers_t) parameter);
-        float value;
+      unsigned int register_value = (unsigned int) L6474_CmdGetParam((L6474_Registers_t) parameter);
+      float value;
 
-        switch ((L6474_Registers_t) parameter) {
-            case L6474_TVAL:
-                value = L6474_Par_to_Tval_Current((float) register_value);
-                break;
-            case L6474_TON_MIN:
-            case L6474_TOFF_MIN:
-                value = L6474_Par_to_Tmin_Time((float) register_value);
-                break;
-            default:
-                value = (float) register_value;
-                break;
-        }
-        
-        return value;
+      switch ((L6474_Registers_t) parameter) {
+        case L6474_TVAL:
+          value = L6474_Par_to_Tval_Current((float) register_value);
+          break;
+        case L6474_TON_MIN:
+        case L6474_TOFF_MIN:
+          value = L6474_Par_to_Tmin_Time((float) register_value);
+          break;
+        default:
+          value = (float) register_value;
+          break;
+      }
+
+      return value;
     }
 
     /**
@@ -276,7 +279,7 @@ public:
      */
     virtual signed int get_position(void)
     {
-        return (signed int) L6474_GetPosition();
+      return (signed int) L6474_GetPosition();
     }
 
     /**
@@ -286,7 +289,7 @@ public:
      */
     virtual signed int get_mark(void)
     {
-        return (signed int) L6474_GetMark();
+      return (signed int) L6474_GetMark();
     }
 
     /**
@@ -296,7 +299,7 @@ public:
      */
     virtual unsigned int get_speed(void)
     {
-        return (unsigned int) L6474_GetCurrentSpeed();
+      return (unsigned int) L6474_GetCurrentSpeed();
     }
 
     /**
@@ -306,7 +309,7 @@ public:
      */
     virtual unsigned int get_max_speed(void)
     {
-        return (unsigned int) L6474_GetMaxSpeed();
+      return (unsigned int) L6474_GetMaxSpeed();
     }
 
     /**
@@ -316,7 +319,7 @@ public:
      */
     virtual unsigned int get_min_speed(void)
     {
-        return (unsigned int) L6474_GetMinSpeed();
+      return (unsigned int) L6474_GetMinSpeed();
     }
 
     /**
@@ -326,7 +329,7 @@ public:
      */
     virtual unsigned int get_acceleration(void)
     {
-        return (unsigned int) L6474_GetAcceleration();
+      return (unsigned int) L6474_GetAcceleration();
     }
 
     /**
@@ -336,7 +339,7 @@ public:
      */
     virtual unsigned int get_deceleration(void)
     {
-        return (unsigned int) L6474_GetDeceleration();
+      return (unsigned int) L6474_GetDeceleration();
     }
 
     /**
@@ -346,7 +349,7 @@ public:
      */
     virtual direction_t get_direction(void)
     {
-        return (direction_t) (L6474_GetDirection() == FORWARD ? StepperMotor::FWD : StepperMotor::BWD);
+      return (direction_t)(L6474_GetDirection() == FORWARD ? StepperMotor::FWD : StepperMotor::BWD);
     }
 
     /**
@@ -402,22 +405,22 @@ public:
      */
     virtual void set_parameter(unsigned int parameter, float value)
     {
-        float register_value;
+      float register_value;
 
-        switch ((L6474_Registers_t) parameter) {
-            case L6474_TVAL:
-                register_value = L6474_Tval_Current_to_Par(value);
-                break;
-            case L6474_TON_MIN:
-            case L6474_TOFF_MIN:
-                register_value = L6474_Tmin_Time_to_Par(value);
-                break;
-            default:
-                register_value = value;
-                break;
-        }
+      switch ((L6474_Registers_t) parameter) {
+        case L6474_TVAL:
+          register_value = L6474_Tval_Current_to_Par(value);
+          break;
+        case L6474_TON_MIN:
+        case L6474_TOFF_MIN:
+          register_value = L6474_Tmin_Time_to_Par(value);
+          break;
+        default:
+          register_value = value;
+          break;
+      }
 
-        L6474_CmdSetParam((L6474_Registers_t) parameter, (unsigned int) register_value);
+      L6474_CmdSetParam((L6474_Registers_t) parameter, (unsigned int) register_value);
     }
 
     /**
@@ -427,7 +430,7 @@ public:
      */
     virtual void set_home(void)
     {
-        L6474_SetHome();
+      L6474_SetHome();
     }
 
     /**
@@ -437,7 +440,7 @@ public:
      */
     virtual void set_mark(void)
     {
-        L6474_SetMark();
+      L6474_SetMark();
     }
 
     /**
@@ -447,8 +450,8 @@ public:
      */
     virtual bool set_max_speed(unsigned int speed)
     {
-        L6474_SetMaxSpeed((unsigned int) speed);
-        return true;
+      L6474_SetMaxSpeed((unsigned int) speed);
+      return true;
     }
 
     /**
@@ -458,8 +461,8 @@ public:
      */
     virtual bool set_min_speed(unsigned int speed)
     {
-        L6474_SetMinSpeed((unsigned int) speed);
-        return true;
+      L6474_SetMinSpeed((unsigned int) speed);
+      return true;
     }
 
     /**
@@ -469,8 +472,8 @@ public:
      */
     virtual bool set_acceleration(unsigned int acceleration)
     {
-        L6474_SetAcceleration((unsigned int) acceleration);
-        return true;
+      L6474_SetAcceleration((unsigned int) acceleration);
+      return true;
     }
 
     /**
@@ -480,8 +483,8 @@ public:
      */
     virtual bool set_deceleration(unsigned int deceleration)
     {
-        L6474_SetDeceleration((unsigned int) deceleration);
-        return true;
+      L6474_SetDeceleration((unsigned int) deceleration);
+      return true;
     }
 
     /**
@@ -491,7 +494,7 @@ public:
      */
     virtual void go_to(signed int position)
     {
-        L6474_GoTo((signed int) position);
+      L6474_GoTo((signed int) position);
     }
 
     /**
@@ -501,7 +504,7 @@ public:
      */
     virtual void go_home(void)
     {
-        L6474_GoHome();
+      L6474_GoHome();
     }
 
     /**
@@ -511,7 +514,7 @@ public:
      */
     virtual void go_mark(void)
     {
-        L6474_GoMark();
+      L6474_GoMark();
     }
 
     /**
@@ -521,7 +524,7 @@ public:
      */
     virtual void run(direction_t direction)
     {
-        L6474_Run((motorDir_t) (direction == StepperMotor::FWD ? FORWARD : BACKWARD));
+      L6474_Run((motorDir_t)(direction == StepperMotor::FWD ? FORWARD : BACKWARD));
     }
 
     /**
@@ -532,7 +535,7 @@ public:
      */
     virtual void move(direction_t direction, unsigned int steps)
     {
-        L6474_Move((motorDir_t) (direction == StepperMotor::FWD ? FORWARD : BACKWARD), (unsigned int) steps);
+      L6474_Move((motorDir_t)(direction == StepperMotor::FWD ? FORWARD : BACKWARD), (unsigned int) steps);
     }
 
     /**
@@ -542,7 +545,7 @@ public:
      */
     virtual void soft_stop(void)
     {
-        L6474_SoftStop();
+      L6474_SoftStop();
     }
 
     /**
@@ -552,7 +555,7 @@ public:
      */
     virtual void hard_stop(void)
     {
-        L6474_HardStop();
+      L6474_HardStop();
     }
 
     /**
@@ -562,8 +565,8 @@ public:
      */
     virtual void soft_hiz(void)
     {
-        L6474_SoftStop();
-        L6474_CmdDisable();
+      L6474_SoftStop();
+      L6474_CmdDisable();
     }
 
     /**
@@ -573,8 +576,8 @@ public:
      */
     virtual void hard_hiz(void)
     {
-        L6474_HardStop();
-        L6474_CmdDisable();
+      L6474_HardStop();
+      L6474_CmdDisable();
     }
 
     /**
@@ -584,22 +587,22 @@ public:
      */
     virtual void wait_while_active(void)
     {
-        L6474_WaitWhileActive();
+      L6474_WaitWhileActive();
     }
 
-   /**
-     * @brief  Getting the device state.
-     * @param  None.
-     * @retval The device state.
-     * @note   The device state can be one of the following:
-     *           + ACCELERATING
-     *           + DECELERATING
-     *           + STEADY
-     *           + INACTIVE
-    */
+    /**
+      * @brief  Getting the device state.
+      * @param  None.
+      * @retval The device state.
+      * @note   The device state can be one of the following:
+      *           + ACCELERATING
+      *           + DECELERATING
+      *           + STEADY
+      *           + INACTIVE
+     */
     virtual motorState_t get_device_state(void)
     {
-        return (motorState_t) L6474_GetDeviceState();
+      return (motorState_t) L6474_GetDeviceState();
     }
 
     /**
@@ -611,7 +614,7 @@ public:
      */
     virtual uint16_t read_status_register(void)
     {
-        return (uint16_t) L6474_ReadStatusRegister();
+      return (uint16_t) L6474_ReadStatusRegister();
     }
 
     /**
@@ -625,13 +628,13 @@ public:
      */
     virtual bool set_step_mode(step_mode_t step_mode)
     {
-        if (step_mode > STEP_MODE_1_16) {
-            return false;
-        }
+      if (step_mode > STEP_MODE_1_16) {
+        return false;
+      }
 
-        soft_hiz();
-        L6474_SelectStepMode((motorStepMode_t) step_mode);
-        return true;
+      soft_hiz();
+      L6474_SelectStepMode((motorStepMode_t) step_mode);
+      return true;
     }
 
     /**
@@ -641,7 +644,7 @@ public:
      */
     virtual void attach_error_handler(void (*fptr)(uint16_t error))
     {
-        L6474_AttachErrorHandler((void (*)(uint16_t error)) fptr);
+      L6474_AttachErrorHandler((void (*)(uint16_t error)) fptr);
     }
 
     /**
@@ -651,9 +654,9 @@ public:
      */
     virtual void enable(void)
     {
-        L6474_CmdEnable();
+      L6474_CmdEnable();
     }
-    
+
     /**
      * @brief  Disabling the device.
      * @param  None.
@@ -661,7 +664,7 @@ public:
      */
     virtual void disable(void)
     {
-        L6474_CmdDisable();
+      L6474_CmdDisable();
     }
 
     /**
@@ -671,7 +674,7 @@ public:
      */
     virtual uint8_t get_fw_version(void)
     {
-        return (uint8_t) L6474_GetFwVersion();
+      return (uint8_t) L6474_GetFwVersion();
     }
 
 
@@ -713,9 +716,9 @@ public:
      */
     void attach_flag_irq(void (*fptr)(void))
     {
-        int_cb = fptr;
+      int_cb = fptr;
     }
-    
+
     /**
      * @brief  Enabling the FLAG interrupt handling.
      * @param  None.
@@ -723,9 +726,9 @@ public:
      */
     void enable_flag_irq(void)
     {
-       attachInterrupt(flag_irq, int_cb, FALLING);
+      attachInterrupt(flag_irq, int_cb, FALLING);
     }
-    
+
     /**
      * @brief  Disabling the FLAG interrupt handling.
      * @param  None.
@@ -733,11 +736,11 @@ public:
      */
     void disable_flag_irq(void)
     {
-       detachInterrupt(flag_irq);
+      detachInterrupt(flag_irq);
     }
 
 
-protected:
+  protected:
 
     /*** Protected Component Related Methods ***/
 
@@ -817,46 +820,46 @@ protected:
      * @param[in]  NumBytesToRead number of bytes to read.
      * @retval     COMPONENT_OK in case of success, COMPONENT_ERROR otherwise.
      */
-    status_t Read(uint8_t* pBuffer, uint16_t NumBytesToRead)
+    status_t Read(uint8_t *pBuffer, uint16_t NumBytesToRead)
     {
-        if (dev_spi) {
-          dev_spi->beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE3));
-          digitalWrite(ssel, LOW);
+      if (dev_spi) {
+        dev_spi->beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE3));
+        digitalWrite(ssel, LOW);
 
-          for (uint16_t i=0; i<NumBytesToRead; i++) {
-            *(pBuffer+i) = dev_spi->transfer(0x00);
-          }
-
-          digitalWrite(ssel, HIGH);
-
-          dev_spi->endTransaction();
+        for (uint16_t i = 0; i < NumBytesToRead; i++) {
+          *(pBuffer + i) = dev_spi->transfer(0x00);
         }
 
-        return COMPONENT_OK;
+        digitalWrite(ssel, HIGH);
+
+        dev_spi->endTransaction();
+      }
+
+      return COMPONENT_OK;
     }
-    
+
     /**
      * @brief      Utility function to write data to L6474.
      * @param[in]  pBuffer pointer to the buffer of data to send.
      * @param[in]  NumBytesToWrite number of bytes to write.
      * @retval     COMPONENT_OK in case of success, COMPONENT_ERROR otherwise.
      */
-    status_t Write(uint8_t* pBuffer, uint16_t NumBytesToWrite)
+    status_t Write(uint8_t *pBuffer, uint16_t NumBytesToWrite)
     {
-        if (dev_spi) {
-          dev_spi->beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE3));
-          digitalWrite(ssel, LOW);
+      if (dev_spi) {
+        dev_spi->beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE3));
+        digitalWrite(ssel, LOW);
 
-          for (uint16_t i=0; i<NumBytesToWrite; i++) {
-            dev_spi->transfer(pBuffer[i]);
-          }
-
-          digitalWrite(ssel, HIGH);
-
-          dev_spi->endTransaction();
+        for (uint16_t i = 0; i < NumBytesToWrite; i++) {
+          dev_spi->transfer(pBuffer[i]);
         }
 
-        return COMPONENT_OK;
+        digitalWrite(ssel, HIGH);
+
+        dev_spi->endTransaction();
+      }
+
+      return COMPONENT_OK;
     }
 
     /**
@@ -866,22 +869,22 @@ protected:
      * @param[in]  NumBytes number of bytes to read and write.
      * @retval     COMPONENT_OK in case of success, COMPONENT_ERROR otherwise.
      */
-    status_t ReadWrite(uint8_t* pBufferToRead, uint8_t* pBufferToWrite, uint16_t NumBytes)
+    status_t ReadWrite(uint8_t *pBufferToRead, uint8_t *pBufferToWrite, uint16_t NumBytes)
     {
-        if (dev_spi) {
-          dev_spi->beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE3));
-          digitalWrite(ssel, LOW);
+      if (dev_spi) {
+        dev_spi->beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE3));
+        digitalWrite(ssel, LOW);
 
-          for (uint16_t i=0; i<NumBytes; i++) {
-            *(pBufferToRead+i) = dev_spi->transfer(pBufferToWrite[i]);
-          }
-
-          digitalWrite(ssel, HIGH);
-
-          dev_spi->endTransaction();
+        for (uint16_t i = 0; i < NumBytes; i++) {
+          *(pBufferToRead + i) = dev_spi->transfer(pBufferToWrite[i]);
         }
 
-        return COMPONENT_OK;
+        digitalWrite(ssel, HIGH);
+
+        dev_spi->endTransaction();
+      }
+
+      return COMPONENT_OK;
     }
 
     /* ACTION 8 --------------------------------------------------------------*
@@ -895,7 +898,7 @@ protected:
      */
     void L6474_Delay(uint32_t ms_delay)
     {
-        delay(ms_delay);
+      delay(ms_delay);
     }
 
     /**
@@ -905,7 +908,7 @@ protected:
      */
     void L6474_EnableIrq(void)
     {
-        interrupts();
+      interrupts();
     }
 
     /**
@@ -915,7 +918,7 @@ protected:
      */
     void L6474_DisableIrq(void)
     {
-        noInterrupts();
+      noInterrupts();
     }
 
     /**
@@ -933,7 +936,7 @@ protected:
      */
     void L6474_PwmSetFreq(uint16_t frequency)
     {
-        pwm_timer->setPWM(pwm_channel, pwm_pin, frequency, 50, callback_handler, NULL);
+      pwm_timer->setPWM(pwm_channel, pwm_pin, frequency, 50, callback_handler, NULL);
     }
 
     /**
@@ -943,8 +946,8 @@ protected:
      */
     void L6474_PwmStop(void)
     {
-        pwm_timer->pause();
-        pwm_timer->detachInterrupt();
+      pwm_timer->pause();
+      pwm_timer->detachInterrupt();
     }
 
     /**
@@ -954,7 +957,7 @@ protected:
      */
     void L6474_ReleaseReset(void)
     {
-        digitalWrite(standby_reset, HIGH);
+      digitalWrite(standby_reset, HIGH);
     }
 
     /**
@@ -964,7 +967,7 @@ protected:
      */
     void L6474_Reset(void)
     {
-        digitalWrite(standby_reset, LOW);
+      digitalWrite(standby_reset, LOW);
     }
 
     /**
@@ -974,7 +977,7 @@ protected:
      */
     void L6474_SetDirectionGpio(uint8_t gpioState)
     {
-        digitalWrite(direction, gpioState);
+      digitalWrite(direction, gpioState);
     }
 
     /**
@@ -985,7 +988,7 @@ protected:
      */
     uint8_t L6474_SpiWriteBytes(uint8_t *pByteToTransmit, uint8_t *pReceivedByte)
     {
-        return (uint8_t) (ReadWrite(pReceivedByte, pByteToTransmit, number_of_devices) == COMPONENT_OK ? 0 : 1);
+      return (uint8_t)(ReadWrite(pReceivedByte, pByteToTransmit, number_of_devices) == COMPONENT_OK ? 0 : 1);
     }
 
 
@@ -1067,7 +1070,7 @@ protected:
     static uint8_t spi_rx_bursts[L6474_CMD_ARG_MAX_NB_BYTES][MAX_NUMBER_OF_DEVICES];
 
 
-public:
+  public:
 
     /* Static data. */
     static bool spi_preemtion_by_isr;
@@ -1076,4 +1079,4 @@ public:
 
 #endif // __L6474_CLASS_H
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/ 
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
