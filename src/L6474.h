@@ -136,6 +136,7 @@ class L6474 : public StepperMotor {
       pwm_channel = STM_PIN_CHANNEL(pinmap_function(digitalPinToPinName(pwm_pin), PinMap_PWM));
 
       pwm_timer = new HardwareTimer(pwm_instance);
+      first_time_pwm = true;
 
       /* ACTION 4 ----------------------------------------------------------*
        * Initialize here the component's member variables, one variable per *
@@ -936,6 +937,11 @@ class L6474 : public StepperMotor {
      */
     void L6474_PwmSetFreq(uint16_t frequency)
     {
+      if (!first_time_pwm) {
+        pwm_timer->pauseChannel(pwm_channel);
+      } else {
+        first_time_pwm = false;
+      }
       pwm_timer->setPWM(pwm_channel, pwm_pin, frequency, 50, callback_handler, NULL);
     }
 
@@ -1025,6 +1031,7 @@ class L6474 : public StepperMotor {
     uint32_t pwm_channel;
     uint8_t pwm_pin;
     TIM_TypeDef *pwm_instance;
+    bool first_time_pwm;
     PwmHandler_Callback callback_handler;
 
     /* ACTION 11 -------------------------------------------------------------*
