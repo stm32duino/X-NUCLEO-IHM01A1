@@ -940,7 +940,7 @@ class L6474 : public StepperMotor {
       if (!first_time_pwm) {
         pwm_timer->pauseChannel(pwm_channel);
       } else {
-       first_time_pwm = false;
+        first_time_pwm = false;
       }
       pwm_timer->setPWM(pwm_channel, pwm_pin, frequency, 50, callback_handler, NULL);
     }
